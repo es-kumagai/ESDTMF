@@ -56,9 +56,9 @@ extension DualToneGenerator {
 		/// Creates the phase step information.
 		init(phase: DualTonePhase, sampleRate rate: DualToneSampleRate) {
 			
-			let base = Float64.pi * 2 / rate
+			let factorPerSample = Float64.pi * 2 / rate
 			
-			self.stride = .init(low: phase.low * base, high: phase.high * base)
+			self.stride = .init(low: phase.low * factorPerSample, high: phase.high * factorPerSample)
 		}
 	}
 }
