@@ -13,19 +13,16 @@ public struct DualToneGenerator {
 	public let signal: DualToneSignal
 	
 	/// The sample rate to generating the dual tone wave.
-	public let sampleRate: DualToneSampleRate
+	public var sampleRate: DualToneSampleRate {
+		
+		return state.sampleRate
+	}
 	
 	/// The current volume of dual tone wave that will generate.
 	public var volume: Volume
 
-	/// The phase of the dual tone wave.
-	fileprivate let tonePhase: DualTonePhase
-
-	/// The current phase to use for generating the dual tone wave.
-	fileprivate var currentPhase: DualTonePhase
-	
-	/// The coefficient to use for generating the dual tone wave.
-	fileprivate var currentPhaseStep: PhaseStep
+	/// The private state to use for generating the dual tone wave.
+	fileprivate var state: GenerateState
 
 	/// Creates the dual tone generator for signal.
 	///
@@ -38,15 +35,37 @@ public struct DualToneGenerator {
 		volume = v
 		signal = s
 		
-		tonePhase = s.phase
-		sampleRate = rate
-		
-		currentPhase = .init(low: 0, high: 0)
-		currentPhaseStep = .init(phase: tonePhase, sampleRate: sampleRate)
+		state = .init(phase: s.phase, sampleRate: rate)
 	}
 }
 
 extension DualToneGenerator {
+	
+	/// The type contains data to use for generating the dual tone wave.
+	struct GenerateState {
+		
+		/// The phase of the dual tone wave.
+		let tonePhase: DualTonePhase
+
+		/// The sample rate to generating the dual tone wave.
+		let sampleRate: DualToneSampleRate
+
+		/// The current phase to use for generating the dual tone wave.
+		var currentPhase: DualTonePhase
+		
+		/// The coefficient to use for generating the dual tone wave.
+		var currentPhaseStep: PhaseStep
+		
+		/// Creates initial state.
+		init(phase: DualTonePhase, sampleRate rate: DualToneSampleRate) {
+			
+			tonePhase = phase
+			sampleRate = rate
+			
+			currentPhase = .init(low: 0, high: 0)
+			currentPhaseStep = .init(phase: phase, sampleRate: rate)
+		}
+	}
 	
 	/// The type expresses step of phase data.
 	struct PhaseStep {
@@ -63,6 +82,15 @@ extension DualToneGenerator {
 	}
 }
 
+extension DualToneGenerator.GenerateState {
+
+	/// Procees to the next state.
+	mutating func proceedToNextState() {
+	
+		currentPhase.advance(by: currentPhaseStep.stride)
+	}
+}
+
 extension DualToneGenerator : IteratorProtocol {
 	
 	/// Returns a next sample of the dual tone expressed by this generator.
@@ -70,9 +98,9 @@ extension DualToneGenerator : IteratorProtocol {
 		
 		defer {
 			
-			currentPhase.advance(by: currentPhaseStep.stride)
+			state.proceedToNextState()
 		}
 		
-		return currentPhase.waveSample * volume.coefficient
+		return state.currentPhase.waveSample * volume.coefficient
 	}
 }
