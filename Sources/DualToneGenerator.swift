@@ -77,7 +77,7 @@ extension DualToneGenerator {
 			
 			let factorPerSample = Float64.pi * 2 / rate
 			
-			self.stride = .init(low: phase.low * factorPerSample, high: phase.high * factorPerSample)
+			stride = .init(low: phase.low * factorPerSample, high: phase.high * factorPerSample)
 		}
 	}
 }
