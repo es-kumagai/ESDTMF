@@ -6,6 +6,8 @@
 //
 //
 
+import ESAudio
+
 /// A sequence that supplying dual tone wave samples of the dual tone signal.
 public struct DualToneSequence : Sequence {
 	

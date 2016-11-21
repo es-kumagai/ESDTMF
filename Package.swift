@@ -1,5 +1,8 @@
 import PackageDescription
 
 let package = Package(
-	name: "ESDTMF"
+	name: "ESDTMF",
+    targets: [
+        Target(name: "ESDTMF", dependencies: ["ESAudio"])
+    ]
 )

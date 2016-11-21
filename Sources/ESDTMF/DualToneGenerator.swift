@@ -6,6 +6,8 @@
 //
 //
 
+import ESAudio
+
 /// The dual tone wave generator.
 public struct DualToneGenerator {
 
